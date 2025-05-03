@@ -10,3 +10,5 @@
 - Understand the key concepts of CI/CD.
 - Set up a simple **CI pipeline** using **GitHub Actions**.
 - Automate testing and deployment processes.
+
+![[Pasted image 20250503130353.png]]
