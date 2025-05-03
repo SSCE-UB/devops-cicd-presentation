@@ -1,7 +1,12 @@
 name: Deploy
+
 on:
   push:
     branches: [main]
+
+# Ensure GITHUB_TOKEN has write permissions to create/update the gh-pages branch
+permissions:
+  contents: write
 
 jobs:
   deploy:
@@ -11,12 +16,35 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-      - run: python src/generate_html.py
-      - uses: peaceiris/actions-gh-pages@v3
+
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install --upgrade pip
+            pip install -r requirements.txt
+          fi
+
+      - name: Debug file structure
+        run: |
+          echo "Workspace contents:" && ls -R .
+
+      - name: Generate HTML
+        run: python src/generate_html.py
+
+      - name: List docs directory
+        run: |
+          echo "Docs directory after generation:" && ls -R docs
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs
           publish_branch: gh-pages
+          force_orphan: true
+          clean: true
